@@ -29,7 +29,7 @@ namespace Initial_D_PSP_Tools
 
         private void fileInjector_Click(object sender, EventArgs e)
         {
-            new InitD.Core().injectData();
+            new InitD.Core().saveAs();
         }
 
         private void contextMenuStrip1_Opening(object sender, CancelEventArgs e)
@@ -49,7 +49,7 @@ namespace Initial_D_PSP_Tools
 
         private void replaceFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new InitD.Core().injectData();
+            new InitD.Core().saveAs();
         }
 
         private void listBoxVFS_SelectedIndexChanged(object sender, EventArgs e)
@@ -59,7 +59,44 @@ namespace Initial_D_PSP_Tools
 
         private void saveVFSToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new InitD.Core().injectData();
+            new InitD.Core().saveAs();
+        }
+
+        private void listViewMain_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void MainWindow_Load(object sender, EventArgs e)
+        {
+            listViewMain.AllowDrop = true;
+            listViewMain.DragDrop += new DragEventHandler(listViewMain_DragDrop);
+            listViewMain.DragEnter += new DragEventHandler(listViewMain_DragEnter);
+        }
+
+        void listViewMain_DragEnter(object sender, DragEventArgs e)
+        {
+            e.Effect = DragDropEffects.Copy;
+        }
+
+        void listViewMain_DragDrop(object sender, DragEventArgs e)
+        {
+            new InitD.Core().injectData(e);
+        }
+
+        private void saveVFSToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            new InitD.Core().save();
+        }
+
+        private void howToModifyAFileInVFSToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Simply drag'n drop your modified file into the list in this application! Remember: The filename muss match with the original one, or it will be ignored!");
+        }
+
+        private void toolStripStatusLabel1_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

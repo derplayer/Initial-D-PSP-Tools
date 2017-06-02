@@ -11,6 +11,8 @@ namespace Initial_D_PSP_Tools.InitD
 {
     class Core
     {
+        public static string loadedVFS { get; set; }
+
 
         public void Main()
         {
@@ -25,7 +27,7 @@ namespace Initial_D_PSP_Tools.InitD
             {
                 file = newPathDlg.FileName;
                 directory = Path.GetDirectoryName(file);
-
+                loadedVFS = file;
 
                 List<DataEntry> readedFiles = new Data().LoadVFS(file, directory);
 
@@ -47,19 +49,62 @@ namespace Initial_D_PSP_Tools.InitD
                     System.Diagnostics.Debug.WriteLine("Something blew up...");
                 }
 
-                System.Diagnostics.Debug.WriteLine("Finished! Breakpoint...");
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "Loading finished! (" + newPathDlg.FileName + ")";
             }
 
         }
 
-        public void injectData()
+        public void injectData(DragEventArgs droppedFile)
         {
-            SaveFileDialog newSavePathDlg = new SaveFileDialog();
-            newSavePathDlg.Filter = "Initial D - Street Stage - VFS Binary|*.bin";
+            string[] FileList = (string[])droppedFile.Data.GetData(DataFormats.FileDrop, false);
 
-            if (newSavePathDlg.ShowDialog() == DialogResult.OK)
+            foreach (var filePath in FileList)
             {
-                new Data().SaveVFS(newSavePathDlg.FileName);
+                string checkfileName = Path.GetFileName(filePath);
+
+                foreach (var savedFile in DataCollector.Files)
+                {
+                    if (checkfileName == savedFile.file_name)
+                    {
+                        byte[] newFile = File.ReadAllBytes(filePath);
+                        savedFile.file_data = newFile;
+                        savedFile.file_modified = true;
+                        Program.MainWindowCore.toolStripStatusLabel1.Text = "Drag'Drop File modified! (" + checkfileName + ")";
+                    }
+                }
+
+                Data.UpdateGUI();
+            }
+        }
+
+        public void save()
+        {
+            if (loadedVFS != null)
+            {
+                new Data().SaveVFS(loadedVFS);
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "VFS saved!";
+            }
+            else
+            {
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "Please load first an file!";
+            }
+}
+
+        public void saveAs()
+        {
+            if (loadedVFS != null) {
+                SaveFileDialog newSavePathDlg = new SaveFileDialog();
+                newSavePathDlg.Filter = "Initial D - Street Stage - VFS Binary|*.bin";
+
+                if (newSavePathDlg.ShowDialog() == DialogResult.OK)
+                {
+                    new Data().SaveVFS(newSavePathDlg.FileName);
+                    Program.MainWindowCore.toolStripStatusLabel1.Text = "VFS saved!";
+                }
+            }
+            else
+            {
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "Please load first an file!";
             }
         }
 
@@ -81,7 +126,7 @@ namespace Initial_D_PSP_Tools.InitD
                     crcList += "Hash" + i + " | " + BitConverter.ToString(crcItem) + Environment.NewLine;
                     i++;
                 }
-
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "CRC Debug finnished...";
                 MessageBox.Show(crcList);  
             }
         }

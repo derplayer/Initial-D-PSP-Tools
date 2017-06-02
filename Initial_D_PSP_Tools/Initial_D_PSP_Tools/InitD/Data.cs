@@ -28,6 +28,7 @@ namespace Initial_D_PSP_Tools.InitD
         public byte[] file_data { get; set; }
         public string file_name { get; set; }
         public byte[] file_name_pointer { get; set; }
+        public bool file_modified { get; set; }
     }
 
     public class Data
@@ -64,6 +65,7 @@ namespace Initial_D_PSP_Tools.InitD
                     actualFile.file_name_pointer = reader.ReadBytes(4);
 
                     actualFile.file_unknownhash = reader.ReadBytes(4);
+                    actualFile.file_modified = false;
 
                     DataCollector.Files.Add(actualFile);
                 }
@@ -173,72 +175,10 @@ namespace Initial_D_PSP_Tools.InitD
                     writer.Write(file.file_data);
 
                 }
-                    /*
-                    for (int i = 1; i <= DataCollector.Files.Count; i++)
-                    {
-                        DataEntry actualFile = new DataEntry();
-
-                        //byte[] fileEntryBytes = new byte[15];
-                        //reader.Read(fileEntryBytes, 0, fileEntryBytes.Length);
-
-                        actualFile.index_position = i;
-                        actualFile.file_begin = reader.ReadBytes(4);
-                        actualFile.file_end = reader.ReadBytes(4);
-
-                        int pointerMergeInt = BitConverter.ToInt32(actualFile.file_begin, 0) + BitConverter.ToInt32(actualFile.file_end, 0);
-                        byte[] pointerMerge = BitConverter.GetBytes(pointerMergeInt);
-
-                        actualFile.file_size = pointerMerge;
-                        actualFile.file_name_pointer = reader.ReadBytes(4);
-
-                        actualFile.file_unknownhash = reader.ReadBytes(4);
-
-                        DataCollector.Files.Add(actualFile);
-                    }
-
-
-                    //ignore unknown meta data for first (8 bytes per file)
-                    //reader.BaseStream.Seek(fileCount * 8 , SeekOrigin.Current); //+8 byte per file
-                    DataCollector.MetaBlock = reader.ReadBytes(fileCount * 8);
-
-                    foreach (var file in DataCollector.Files)
-                    {
-                        string fileName = null;
-
-                        while (true)
-                        {
-                            byte singleByte = reader.ReadByte();
-
-                            if (singleByte == 0) { break; }
-                            fileName += Convert.ToChar(singleByte);
-                        }
-
-                        file.file_name = fileName;
-                    }
-
-                    //rape on memory managment / 27.05.2017-28.05.2017
-                    foreach (var file in DataCollector.Files) //new foreach beacause of stream position (muh performance heh)
-                    {
-                        reader.BaseStream.Seek(BitConverter.ToInt32(file.file_begin, 0), SeekOrigin.Begin);
-
-                        long startPos = BitConverter.ToInt32(file.file_begin, 0);
-                        long endPos = BitConverter.ToInt32(file.file_size, 0);
-
-                        byte[] dataArray = new byte[endPos - startPos];
-                        reader.Read(dataArray, 0, dataArray.Length);
-
-                        file.file_data = dataArray;
-                    }
-                    reader.Close();
-                }
-
-                UpdateGUI();
-                return DataCollector.Files;
-                */
                 }
         }
 
-        private static void UpdateGUI()
+        public static void UpdateGUI()
         {
 
             foreach (var item in Program.MainWindowCore.listViewMain.Items)
@@ -261,6 +201,7 @@ namespace Initial_D_PSP_Tools.InitD
                     lvi.SubItems.Add(item.file_data.Length.ToString());
                     lvi.SubItems.Add(item.file_name.ToString());
                     lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_name_pointer).Replace("-", "")));
+                    lvi.SubItems.Add(item.file_modified.ToString());
 
                     Program.MainWindowCore.listViewMain.Items.Add(lvi);
 

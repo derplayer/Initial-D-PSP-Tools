@@ -18,6 +18,10 @@ namespace Initial_D_PSP_Tools
         {
             Application.EnableVisualStyles();
             //Application.SetCompatibleTextRenderingDefault(false);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                MainWindowCore.debugToolStripMenuItem.Enabled = true;
+            }
             Run();
         }
 
