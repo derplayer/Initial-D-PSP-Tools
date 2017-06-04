@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO.Compression;
 
 namespace Initial_D_PSP_Tools.InitD
 {
@@ -38,6 +39,33 @@ namespace Initial_D_PSP_Tools.InitD
         {
             clearVFS();
 
+            string tempFileExt = Path.GetExtension(path);
+            string finGZPath = null;
+
+            try {
+                if(tempFileExt == ".gz")
+                {
+                    FileInfo fileToDecompress = new FileInfo(path);
+                    using (FileStream originalFileStream = fileToDecompress.OpenRead())
+                    {
+                        string currentFileName = fileToDecompress.FullName;
+                        string newFileName = currentFileName.Remove(currentFileName.Length - fileToDecompress.Extension.Length);
+
+                        using (FileStream decompressedFileStream = File.Create(newFileName))
+                        {
+                            using (GZipStream decompressionStream = new GZipStream(originalFileStream, CompressionMode.Decompress))
+                            {
+                                decompressionStream.CopyTo(decompressedFileStream);
+                                finGZPath = newFileName;
+                            }
+                        }
+                    }
+                }
+            } catch(Exception e)
+            {
+                return null;
+            }
+
             using (BinaryReader reader = new BinaryReader(new FileStream(path, FileMode.Open)))
             {
                 string header = Encoding.ASCII.GetString(reader.ReadBytes(3));
@@ -60,7 +88,7 @@ namespace Initial_D_PSP_Tools.InitD
 
                     int pointerMergeInt = BitConverter.ToInt32(actualFile.file_begin, 0) + BitConverter.ToInt32(actualFile.file_end, 0);
                     byte[] pointerMerge = BitConverter.GetBytes(pointerMergeInt);
-                    
+
                     actualFile.file_size = pointerMerge;
                     actualFile.file_name_pointer = reader.ReadBytes(4);
 
@@ -82,7 +110,7 @@ namespace Initial_D_PSP_Tools.InitD
                     {
                         byte singleByte = reader.ReadByte();
 
-                        if(singleByte == 0){ break; }
+                        if (singleByte == 0) { break; }
                         fileName += Convert.ToChar(singleByte);
                     }
 
@@ -97,7 +125,7 @@ namespace Initial_D_PSP_Tools.InitD
                     long startPos = BitConverter.ToInt32(file.file_begin, 0);
                     long endPos = BitConverter.ToInt32(file.file_size, 0);
 
-                    byte[] dataArray = new byte[endPos - startPos]; 
+                    byte[] dataArray = new byte[endPos - startPos];
                     reader.Read(dataArray, 0, dataArray.Length);
 
                     file.file_data = dataArray;
@@ -133,8 +161,53 @@ namespace Initial_D_PSP_Tools.InitD
                     }
                     else
                     {
-                        System.Diagnostics.Debug.WriteLine("File " + file.index_position + " DONT MATCHES the start pointer size!");
-                        //TODO: Pointer recalc... kill me
+                        if (Program.MainWindowCore.checkBoxPointer.Checked)
+                        {
+                            System.Diagnostics.Debug.WriteLine("File " + file.index_position + " DONT MATCHES the start pointer size!");
+                            int newPos = 0;
+
+                            if (checkLengh > file.file_data.Length)
+                            {
+                                newPos = checkLengh - file.file_data.Length;
+                            }
+
+                            if (checkLengh < file.file_data.Length)
+                            {
+                                newPos = file.file_data.Length - checkLengh;
+                            }
+
+                            int actInd = 1;
+                            foreach (var recalcFile in DataCollector.Files)
+                            {
+                                if (actInd >= file.index_position)
+                                {
+
+                                    int pointerMergeIntX = BitConverter.ToInt32(recalcFile.file_begin, 0) + newPos;
+                                    byte[] pointerMergeX = BitConverter.GetBytes(pointerMergeIntX);
+
+                                    int pointerMergeIntY = BitConverter.ToInt32(recalcFile.file_end, 0) + newPos;
+                                    byte[] pointerMergeY = BitConverter.GetBytes(pointerMergeIntY);
+
+                                    recalcFile.file_begin = pointerMergeX;
+                                    recalcFile.file_end = pointerMergeY;
+
+                                }
+                                actInd++;
+                            }
+
+                            //TODO: Pointer recalc... kill me
+
+                            /* Recalc logic
+                             * 1. Calculate the diffrence between old and new
+                             * 2. foreach loop
+                             * 3. add pointer diffrence to every datacontainer after the changed file
+                             */
+                        }
+                        else
+                        {
+                            MessageBox.Show("Warning! Pointer position changed! File will crash the game!\n\r\n\rUse Pointer recalc or dont modify the size!");
+                        }
+
                     }
                 }
 
@@ -167,7 +240,7 @@ namespace Initial_D_PSP_Tools.InitD
                         int filePointer = BitConverter.ToInt32(file.file_begin, 0);
                         long actualPosBef = writer.BaseStream.Position;
 
-                        if(actualPosBef == filePointer)  break;
+                        if (actualPosBef == filePointer) break;
 
                         writer.BaseStream.WriteByte(0x00);
                     }
@@ -175,7 +248,17 @@ namespace Initial_D_PSP_Tools.InitD
                     writer.Write(file.file_data);
 
                 }
+
+                int sF = 0;
+                //Add savespace
+                while (true)
+                {
+                    if (sF > (int)Program.MainWindowCore.numericUpDownOffset.Value) break;
+                    writer.BaseStream.WriteByte(0x00);
+                    sF++;
                 }
+
+            }
         }
 
         public static void UpdateGUI()
@@ -188,22 +271,22 @@ namespace Initial_D_PSP_Tools.InitD
 
             foreach (var item in DataCollector.Files)
             {
-                    // Add the pet to our listview
-                    ListViewItem lvi = new ListViewItem();
+                // Add the pet to our listview
+                ListViewItem lvi = new ListViewItem();
 
-                    lvi.Text = item.index_position.ToString();
+                lvi.Text = item.index_position.ToString();
 
-                    lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_begin).Replace("-", "")));
-                    lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_size).Replace("-", "")));
-                    lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_end).Replace("-", "")));
-                    lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_unknownhash).Replace("-", "")));
+                lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_begin).Replace("-", "")));
+                lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_size).Replace("-", "")));
+                lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_end).Replace("-", "")));
+                lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_unknownhash).Replace("-", "")));
 
-                    lvi.SubItems.Add(item.file_data.Length.ToString());
-                    lvi.SubItems.Add(item.file_name.ToString());
-                    lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_name_pointer).Replace("-", "")));
-                    lvi.SubItems.Add(item.file_modified.ToString());
+                lvi.SubItems.Add(item.file_data.Length.ToString());
+                lvi.SubItems.Add(item.file_name.ToString());
+                lvi.SubItems.Add("0x" + (BitConverter.ToString(item.file_name_pointer).Replace("-", "")));
+                lvi.SubItems.Add(item.file_modified.ToString());
 
-                    Program.MainWindowCore.listViewMain.Items.Add(lvi);
+                Program.MainWindowCore.listViewMain.Items.Add(lvi);
 
             }
 
@@ -225,5 +308,6 @@ namespace Initial_D_PSP_Tools.InitD
             DataCollector.Files = new List<DataEntry>();
             DataCollector.MetaBlock = null;
         }
+
     }
 }

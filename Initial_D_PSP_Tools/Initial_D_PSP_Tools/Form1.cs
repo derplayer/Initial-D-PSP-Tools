@@ -98,5 +98,31 @@ namespace Initial_D_PSP_Tools
         {
 
         }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Value that will be used as an safe space for file pointer address recalculation.\r\nOnly used when size in an modified file changed! (bigger or smaller)\r\n\r\nLeave 128 or add more if you dont know what to pick.");
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            About AboutWindow = new About();
+            AboutWindow.ShowDialog();
+        }
+
+        private void extractVFSRecrusiveToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new InitD.Core().MainRecrusive();
+        }
+
+        private void gIMDebugToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new InitD.GIMCore().initGIM();
+        }
     }
 }

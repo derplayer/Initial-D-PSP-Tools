@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using Microsoft.Win32;
+using System.IO.Compression;
 
 namespace Initial_D_PSP_Tools.InitD
 {
@@ -16,95 +17,185 @@ namespace Initial_D_PSP_Tools.InitD
 
         public void Main()
         {
-
-            System.Diagnostics.Debug.WriteLine("Initial D PSP Tools - Core Module");
-            string directory = null, file = null;
-
-            OpenFileDialog newPathDlg = new OpenFileDialog();
-            newPathDlg.Filter = "Initial D - Street Stage - VFS Binary|*.bin";
-
-            if (newPathDlg.ShowDialog() == DialogResult.OK)
+            try
             {
-                file = newPathDlg.FileName;
-                directory = Path.GetDirectoryName(file);
-                loadedVFS = file;
+                System.Diagnostics.Debug.WriteLine("Initial D PSP Tools - Core Module");
+                string directory = null, file = null;
 
-                List<DataEntry> readedFiles = new Data().LoadVFS(file, directory);
+                OpenFileDialog newPathDlg = new OpenFileDialog();
+                newPathDlg.Filter = "Initial D - Street Stage - VFS Binary|*.bin";
 
-                directory += "\\_Extracted\\";
-                Directory.CreateDirectory(directory);
-
-                try
+                if (newPathDlg.ShowDialog() == DialogResult.OK)
                 {
-                    foreach (var actualFile in readedFiles)
+
+                    file = newPathDlg.FileName;
+                    directory = Path.GetDirectoryName(file);
+                    loadedVFS = file;
+
+                    List<DataEntry> readedFiles = new Data().LoadVFS(file, directory);
+
+                    directory += "\\_" + Path.GetFileName(newPathDlg.FileName) + "_\\";
+                    Directory.CreateDirectory(directory);
+
+                    try
                     {
-                        using (StreamWriter writer = new StreamWriter(new FileStream(directory + "\\" + actualFile.file_name, FileMode.Create)))
+                        foreach (var actualFile in readedFiles)
                         {
-                            writer.BaseStream.Write(actualFile.file_data, 0, actualFile.file_data.Length);
+                            using (StreamWriter writer = new StreamWriter(new FileStream(directory + "\\" + actualFile.file_name, FileMode.Create)))
+                            {
+                                writer.BaseStream.Write(actualFile.file_data, 0, actualFile.file_data.Length);
+                            }
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    System.Diagnostics.Debug.WriteLine("Something blew up...");
-                }
+                    catch (Exception e)
+                    {
+                        System.Diagnostics.Debug.WriteLine("Something blew up...");
+                    }
 
-                Program.MainWindowCore.toolStripStatusLabel1.Text = "Loading finished! (" + newPathDlg.FileName + ")";
+                    Program.MainWindowCore.toolStripStatusLabel1.Text = "Loading finished! (" + newPathDlg.FileName + ")";
+                    Program.MainWindowCore.listViewMain.Visible = true;
+                }
+            }
+            catch (IOException e)
+            {
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "Error at loadData: " + e.TargetSite;
+            }
+        }
+
+        //TODO: Merge MainRecrusive() with Main() to drop the ugly redundance
+        public void MainRecrusive()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("Initial D PSP Tools - Core Module");
+                string directory = null, file = null;
+
+                FolderBrowserDialog newFolderDlg = new FolderBrowserDialog();
+
+                if (newFolderDlg.ShowDialog() == DialogResult.OK)
+                {
+
+                    foreach (var fileXY in GetFiles(newFolderDlg.SelectedPath))
+                    {
+                        file = Path.GetFileName(fileXY);
+                        string tempFileExt = Path.GetExtension(fileXY);
+
+                        if (tempFileExt == ".bin" || tempFileExt == ".gz")
+                        {
+                            directory = Path.GetDirectoryName(fileXY);
+
+                            loadedVFS = fileXY;
+                            List<DataEntry> readedFiles = new Data().LoadVFS(fileXY, directory);
+
+                            if (readedFiles != null)
+                            {
+                                directory += "\\_" + Path.GetFileName(file) + "_\\";
+                                Directory.CreateDirectory(directory);
+
+                                try
+                                {
+                                    foreach (var actualFile in readedFiles)
+                                    {
+                                        using (StreamWriter writer = new StreamWriter(new FileStream(directory + "\\" + actualFile.file_name, FileMode.Create)))
+                                        {
+                                            writer.BaseStream.Write(actualFile.file_data, 0, actualFile.file_data.Length);
+                                        }
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    System.Diagnostics.Debug.WriteLine("Something blew up...");
+                                }
+
+                                Program.MainWindowCore.toolStripStatusLabel1.Text = "Loading finished! (" + file + ")";
+                                Program.MainWindowCore.listViewMain.Visible = true;
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "Error at loadData: " + e.TargetSite;
             }
 
         }
 
+
         public void injectData(DragEventArgs droppedFile)
         {
-            string[] FileList = (string[])droppedFile.Data.GetData(DataFormats.FileDrop, false);
-
-            foreach (var filePath in FileList)
+            try
             {
-                string checkfileName = Path.GetFileName(filePath);
+                string[] FileList = (string[])droppedFile.Data.GetData(DataFormats.FileDrop, false);
 
-                foreach (var savedFile in DataCollector.Files)
+                foreach (var filePath in FileList)
                 {
-                    if (checkfileName == savedFile.file_name)
-                    {
-                        byte[] newFile = File.ReadAllBytes(filePath);
-                        savedFile.file_data = newFile;
-                        savedFile.file_modified = true;
-                        Program.MainWindowCore.toolStripStatusLabel1.Text = "Drag'Drop File modified! (" + checkfileName + ")";
-                    }
-                }
+                    string checkfileName = Path.GetFileName(filePath);
 
-                Data.UpdateGUI();
+                    foreach (var savedFile in DataCollector.Files)
+                    {
+                        if (checkfileName == savedFile.file_name)
+                        {
+                            byte[] newFile = File.ReadAllBytes(filePath);
+                            savedFile.file_data = newFile;
+                            savedFile.file_modified = true;
+                            Program.MainWindowCore.toolStripStatusLabel1.Text = "Drag'Drop File modified! (" + checkfileName + ")";
+                        }
+                    }
+
+                    Data.UpdateGUI();
+                }
+            }
+            catch (IOException e)
+            {
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "Error at injectData: " + e.TargetSite;
             }
         }
 
         public void save()
         {
-            if (loadedVFS != null)
+            try
             {
-                new Data().SaveVFS(loadedVFS);
-                Program.MainWindowCore.toolStripStatusLabel1.Text = "VFS saved!";
+                if (loadedVFS != null)
+                {
+                    new Data().SaveVFS(loadedVFS);
+                    Program.MainWindowCore.toolStripStatusLabel1.Text = "VFS saved!";
+                }
+                else
+                {
+                    Program.MainWindowCore.toolStripStatusLabel1.Text = "Please load first an file!";
+                }
             }
-            else
+            catch (IOException e)
             {
-                Program.MainWindowCore.toolStripStatusLabel1.Text = "Please load first an file!";
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "Error at saveAs: " + e.TargetSite;
             }
-}
+        }
 
         public void saveAs()
         {
-            if (loadedVFS != null) {
-                SaveFileDialog newSavePathDlg = new SaveFileDialog();
-                newSavePathDlg.Filter = "Initial D - Street Stage - VFS Binary|*.bin";
-
-                if (newSavePathDlg.ShowDialog() == DialogResult.OK)
+            try
+            {
+                if (loadedVFS != null)
                 {
-                    new Data().SaveVFS(newSavePathDlg.FileName);
-                    Program.MainWindowCore.toolStripStatusLabel1.Text = "VFS saved!";
+                    SaveFileDialog newSavePathDlg = new SaveFileDialog();
+                    newSavePathDlg.Filter = "Initial D - Street Stage - VFS Binary|*.bin";
+
+                    if (newSavePathDlg.ShowDialog() == DialogResult.OK)
+                    {
+                        new Data().SaveVFS(newSavePathDlg.FileName);
+                        Program.MainWindowCore.toolStripStatusLabel1.Text = "VFS saved!";
+                    }
+                }
+                else
+                {
+                    Program.MainWindowCore.toolStripStatusLabel1.Text = "Please load first an file!";
                 }
             }
-            else
+            catch (IOException e)
             {
-                Program.MainWindowCore.toolStripStatusLabel1.Text = "Please load first an file!";
+                Program.MainWindowCore.toolStripStatusLabel1.Text = "Error at saveAs: " + e.TargetSite;
             }
         }
 
@@ -127,8 +218,45 @@ namespace Initial_D_PSP_Tools.InitD
                     i++;
                 }
                 Program.MainWindowCore.toolStripStatusLabel1.Text = "CRC Debug finnished...";
-                MessageBox.Show(crcList);  
+                MessageBox.Show(crcList);
             }
         }
-}
+
+        static IEnumerable<string> GetFiles(string path)
+        {
+            Queue<string> queue = new Queue<string>();
+            queue.Enqueue(path);
+            while (queue.Count > 0)
+            {
+                path = queue.Dequeue();
+                try
+                {
+                    foreach (string subDir in Directory.GetDirectories(path))
+                    {
+                        queue.Enqueue(subDir);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                }
+                string[] files = null;
+                try
+                {
+                    files = Directory.GetFiles(path);
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine(ex);
+                }
+                if (files != null)
+                {
+                    for (int i = 0; i < files.Length; i++)
+                    {
+                        yield return files[i];
+                    }
+                }
+            }
+        }
+    }
 }
