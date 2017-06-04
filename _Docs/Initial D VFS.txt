@@ -1,0 +1,71 @@
+// ### Initial D Virtual File System - VFS - For general use (*.BIN)
+
+Notes:
+Writeup example based on data\memscene\saveicon_r.bin
+VERY GOOD for debuggung of the VFS (Contains two normal pngs)
+
+  Initial D PSP Header - XBB(?):
+    0x00-03 = Identifier "XBB" (58 42 42)
+    0x04 = Unknown flags (01)
+	0x05 = integer File Count (1 byte)
+    0x06-1F = Empty space for the rest of the header
+
+   Initial D PSP VFS (0x20-7F), always 4 byte chunks???
+	0x20-23 = 1.File bytearray Start Pointer
+	0x24-27 = 1.File bytearray End-Pointer (start + endpointer = pointer to end of file)
+	0x28-2B = 1.File Pointer for filename string (0x0h is used as string seperator)
+	0x2C-2F = 1.File Some kind of gay crc? 
+		-File1: C2 EE 09 00
+		-File2: 4C A0 58 CE
+	
+	[...] File2...
+	[...] Block of unknown Data | always 8 byte Chunnk pro file! (0x0 - 0x7)
+	
+	Note: VFS Metadata Header is always per file 0xF Long (0-15 Bytes)
+
+// ### Container Format For Graphics and shared Palettes (*.ANA)
+
+Note: is pretty much the same as bin VFS, but dosent has crc codes, (and it seems that the filename length is limited)
+
+  Initial D PSP Header - ANA:
+    0x00-03 = Identifier "@ANA" (40 41 4E 41)
+    0x04 = ??? (default 16)
+	0x05-07 = Empty
+	0x08-0B = ??? (not static, changes in every ana file)
+	0x0C = Empty
+	0x0D = Unknown Flag (always 01)
+	0x0E-0x0F = Empty
+	0x10 = File Count
+    0x14-1F = Empty space for the rest of the header
+
+  Initial D PSP ANA (0x20-7F), always 4 byte chunks???
+	0x20-23 = 1.File bytearray Start Pointer
+	0x24-27 = 1.File bytearray End-Pointer (start + endpointer = pointer to end of file)
+	0x28-2F = 1.File Filename string (value 0x00 at the end as seperator)
+	
+	Files have an ANA Part at the end? It seems for me, that it contains a one big palette that is shared for all indexed files
+	Palette seems to be GIM Compatible title\logo.bin\PSP_SEGALOGO.ana contains only one file with one palette at the end!
+	If you remove the Begining header, programms like Noesis recognize it and display it successfully with all colors!
+	
+Note:
+Graphic file is layer based
+Header for one layer is 0x0-0xAF Long
+
+// ### PSP/Initial D Image Format *.GIM something like 16x16
+
+Notes:
+Seems to be 5:6:5 16 bit (no alpha?, color key alpha)
+Format for a Pallete Based Graphic Picture
+Seems to be a successor to the PSX .TIM
+
+  Initial D PSP Header - MIG(?):
+    0x00-0A = Identifier "MIG.00.1PSP" (4D49472E30302E31505350) (Big endian to Little = GIM.1.00PSP)
+    0x0B-F = Empty
+	0x10- = integer File Count (1 byte)
+    0x06-1F = Empty space for the rest of the header
+	
+	bei logo : gegen ende E3 Hex maske = pallette
+	
+---
+GIM exe in : http://webassetsa.scea.com/pscomauth/groups/public/documents/webasset/ps_ps3_customthemetoolbox.zip
+(official sony link muh licence)
