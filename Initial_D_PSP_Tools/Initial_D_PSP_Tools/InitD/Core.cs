@@ -217,6 +217,8 @@ namespace Initial_D_PSP_Tools.InitD
                     crcList += "Hash" + i + " | " + BitConverter.ToString(crcItem) + Environment.NewLine;
                     i++;
                 }
+                crcList += Environment.NewLine + "(Last one is Adler32 with base settings)" + Environment.NewLine;
+
                 Program.MainWindowCore.toolStripStatusLabel1.Text = "CRC Debug finnished...";
                 MessageBox.Show(crcList);
             }

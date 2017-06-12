@@ -11,6 +11,21 @@
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -57,6 +72,12 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="GIMBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GIMBox.Designer.cs">
+      <DependentUpon>GIMBox.cs</DependentUpon>
+    </Compile>
     <Compile Include="GIM\EndOfFileSection.cs" />
     <Compile Include="GIM\EndOfImageSection.cs" />
     <Compile Include="GIM\FileInfoSection.cs" />
@@ -67,6 +88,7 @@
     <Compile Include="GIM\ISection.cs" />
     <Compile Include="GIM\LayerSplitter\Split.cs" />
     <Compile Include="GIM\PaletteSection.cs" />
+    <Compile Include="InitD\Adler32.cs" />
     <Compile Include="InitD\Core.cs" />
     <Compile Include="InitD\CRC.cs" />
     <Compile Include="InitD\Data.cs" />
@@ -80,6 +102,9 @@
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="GIMBox.resx">
+      <DependentUpon>GIMBox.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -89,6 +114,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="External\GIMCPP\GimConv.cfg" />
     <None Include="Properties\DataSources\Initial_D_PSP_Tools.InitD.DataCollector.datasource" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -103,6 +129,35 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="External\GIMCPP\GimConv.exe" />
+    <Content Include="External\GIMCPP\GxoTool.dll" />
+    <Content Include="External\GIMCPP\libpng13.dll" />
+    <Content Include="External\GIMCPP\lib\ExtendEdge.dll" />
+    <Content Include="External\GIMCPP\lib\GimFormat.dll" />
+    <Content Include="External\GIMCPP\lib\GimProc.dll" />
+    <Content Include="External\GIMCPP\lib\ImpExpPNG.dll" />
+    <Content Include="External\GIMCPP\lib\ImportDDS.dll" />
+    <Content Include="External\GIMCPP\msvcp71.dll" />
+    <Content Include="External\GIMCPP\msvcr71.dll" />
+    <Content Include="External\GIMCPP\pngnq.exe" />
+    <Content Include="External\GIMCPP\pngout.exe" />
+    <Content Include="External\GIMCPP\zlib.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 und x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(ProjectDir)External\GIMCPP\*" "$(TargetDir)" /e /y /i /r</PostBuildEvent>
+  </PropertyGroup>
 </Project>

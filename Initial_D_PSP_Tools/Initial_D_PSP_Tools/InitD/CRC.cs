@@ -37,6 +37,12 @@ namespace Initial_D_PSP_Tools.InitD
                 CRC_Collection.Add(output);
                 }
 
+            AdlerChecksum testChecksum = new AdlerChecksum();
+            if (testChecksum.MakeForBuff(Data))
+            {
+                CRC_Collection.Add(BitConverter.GetBytes(testChecksum.ChecksumValue));
+            }
+
             return CRC_Collection;
             }
     }

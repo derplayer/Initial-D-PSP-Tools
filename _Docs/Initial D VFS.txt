@@ -14,7 +14,7 @@ VERY GOOD for debuggung of the VFS (Contains two normal pngs)
 	0x20-23 = 1.File bytearray Start Pointer
 	0x24-27 = 1.File bytearray End-Pointer (start + endpointer = pointer to end of file)
 	0x28-2B = 1.File Pointer for filename string (0x0h is used as string seperator)
-	0x2C-2F = 1.File Some kind of gay crc? 
+	0x2C-2F = 1.File Some kind of checksum? (could be wired Adler32...) -TODO: Phil MIPS ASM magican pls help
 		-File1: C2 EE 09 00
 		-File2: 4C A0 58 CE
 	
@@ -26,6 +26,17 @@ VERY GOOD for debuggung of the VFS (Contains two normal pngs)
 // ### Container Format For Graphics and shared Palettes (*.ANA)
 
 Note: is pretty much the same as bin VFS, but dosent has crc codes, (and it seems that the filename length is limited)
+So: Header is nonstandard, but every sequence that begins with "MIG..." is GIM standarized
+(with a few noncritical errors in header, because reasons)
+WARNING : illegal height align 1
+WARNING : illegal palette level type 0
+WARNING : illegal palette frame type 0
+
+the last squence before EOF (the pallete) is also gim standard, but is shared between ALL container files!
+ingame they are mergen intime, pretty clever
+
+sequences are always INDEX4 based and the Palette is RGB8888
+Palette is only saved in width in initial d ANA (e.x. 256x1 px)
 
   Initial D PSP Header - ANA:
     0x00-03 = Identifier "@ANA" (40 41 4E 41)
@@ -54,18 +65,48 @@ Header for one layer is 0x0-0xAF Long
 // ### PSP/Initial D Image Format *.GIM something like 16x16
 
 Notes:
-Seems to be 5:6:5 16 bit (no alpha?, color key alpha)
-Format for a Pallete Based Graphic Picture
-Seems to be a successor to the PSX .TIM
+Successor to .tm2, tim,... (for PSP & PS3)
+"Matroschka"-like format with many possible formatings (Palette,DXT5,Raw)
 
   Initial D PSP Header - MIG(?):
-    0x00-0A = Identifier "MIG.00.1PSP" (4D49472E30302E31505350) (Big endian to Little = GIM.1.00PSP)
+    0x00-0A = Magic Identifier "MIG.00.1PSP" (4D49472E30302E31505350) (Big endian to Little = GIM.1.00PSP)
     0x0B-F = Empty
 	0x10- = integer File Count (1 byte)
     0x06-1F = Empty space for the rest of the header
 	
 	bei logo : gegen ende E3 Hex maske = pallette
 	
----
-GIM exe in : http://webassetsa.scea.com/pscomauth/groups/public/documents/webasset/ps_ps3_customthemetoolbox.zip
-(official sony link muh licence)
+// ### Tools
+Sony Oficial Tool (Ripped from SDK?): http://webassetsa.scea.com/pscomauth/groups/public/documents/webasset/ps_ps3_customthemetoolbox.zip
+
+// ### Logs from Sony SDK Tool
+
+	Image "image-0"
+		Format INDEX8
+		Order PSPIMAGE
+		Width 512
+		Height 256
+		PitchAlign 16
+		HeightAlign 8
+		PlaneMask 0x00000000
+		LevelType MIPMAP
+		LevelCount 1
+		FrameType SEQUENCE
+		FrameCount 1
+		Pixels "pixels-0" INDEX8 PSPIMAGE 512 256 16 8
+
+	Palette "palette-0"
+		Format RGBA8888
+		Order NORMAL
+		Width 256
+		Height 1
+		PitchAlign 16
+		HeightAlign 1
+		PlaneMask 0x00000000
+		LevelType MIPMAP2
+		LevelCount 1
+		FrameType SEQUENCE
+		FrameCount 1
+		Pixels "pixels-0" RGBA8888 NORMAL 256 1 16 1
+		
+		

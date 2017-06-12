@@ -35,11 +35,13 @@
             this.test1ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveVFSToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.saveVFSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.howToModifyAFileInVFSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.otherToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.extractVFSRecrusiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.debugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cRC32FromLookupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dataCollectorBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.howToModifyAFileInVFSToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.listViewMain = new System.Windows.Forms.ListView();
             this.indexHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.beginHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -57,14 +59,13 @@
             this.button1 = new System.Windows.Forms.Button();
             this.checkBoxPointer = new System.Windows.Forms.CheckBox();
             this.labelMessage = new System.Windows.Forms.Label();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.otherToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.extractVFSRecrusiveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.gIMDebugToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dataCollectorBindingSource = new System.Windows.Forms.BindingSource(this.components);
+            this.gIMOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.gIMShowGIMStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.mainMenuStrip.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataCollectorBindingSource)).BeginInit();
             this.statusStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOffset)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataCollectorBindingSource)).BeginInit();
             this.SuspendLayout();
             // 
             // mainMenuStrip
@@ -72,6 +73,7 @@
             this.mainMenuStrip.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.mainMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.testToolStripMenuItem1,
+            this.gIMOptionsToolStripMenuItem,
             this.otherToolStripMenuItem,
             this.debugToolStripMenuItem,
             this.helpToolStripMenuItem,
@@ -95,23 +97,54 @@
             // test1ToolStripMenuItem
             // 
             this.test1ToolStripMenuItem.Name = "test1ToolStripMenuItem";
-            this.test1ToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.test1ToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.test1ToolStripMenuItem.Text = "Load VFS";
             this.test1ToolStripMenuItem.Click += new System.EventHandler(this.test1ToolStripMenuItem_Click);
             // 
             // saveVFSToolStripMenuItem1
             // 
             this.saveVFSToolStripMenuItem1.Name = "saveVFSToolStripMenuItem1";
-            this.saveVFSToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.saveVFSToolStripMenuItem1.Size = new System.Drawing.Size(143, 22);
             this.saveVFSToolStripMenuItem1.Text = "Save VFS";
             this.saveVFSToolStripMenuItem1.Click += new System.EventHandler(this.saveVFSToolStripMenuItem1_Click);
             // 
             // saveVFSToolStripMenuItem
             // 
             this.saveVFSToolStripMenuItem.Name = "saveVFSToolStripMenuItem";
-            this.saveVFSToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.saveVFSToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.saveVFSToolStripMenuItem.Text = "Save VFS as...";
             this.saveVFSToolStripMenuItem.Click += new System.EventHandler(this.saveVFSToolStripMenuItem_Click);
+            // 
+            // otherToolStripMenuItem
+            // 
+            this.otherToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.extractVFSRecrusiveToolStripMenuItem});
+            this.otherToolStripMenuItem.Name = "otherToolStripMenuItem";
+            this.otherToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
+            this.otherToolStripMenuItem.Text = "Other";
+            // 
+            // extractVFSRecrusiveToolStripMenuItem
+            // 
+            this.extractVFSRecrusiveToolStripMenuItem.Name = "extractVFSRecrusiveToolStripMenuItem";
+            this.extractVFSRecrusiveToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
+            this.extractVFSRecrusiveToolStripMenuItem.Text = "Extract VFS Recrusive";
+            this.extractVFSRecrusiveToolStripMenuItem.Click += new System.EventHandler(this.extractVFSRecrusiveToolStripMenuItem_Click);
+            // 
+            // debugToolStripMenuItem
+            // 
+            this.debugToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.cRC32FromLookupToolStripMenuItem});
+            this.debugToolStripMenuItem.Enabled = false;
+            this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
+            this.debugToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
+            this.debugToolStripMenuItem.Text = "Debug";
+            // 
+            // cRC32FromLookupToolStripMenuItem
+            // 
+            this.cRC32FromLookupToolStripMenuItem.Name = "cRC32FromLookupToolStripMenuItem";
+            this.cRC32FromLookupToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.cRC32FromLookupToolStripMenuItem.Text = "CRC32 From Lookup Tables";
+            this.cRC32FromLookupToolStripMenuItem.Click += new System.EventHandler(this.cRC32FromLookupToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -128,26 +161,12 @@
             this.howToModifyAFileInVFSToolStripMenuItem.Text = "How to modify a file in VFS?";
             this.howToModifyAFileInVFSToolStripMenuItem.Click += new System.EventHandler(this.howToModifyAFileInVFSToolStripMenuItem_Click);
             // 
-            // debugToolStripMenuItem
+            // aboutToolStripMenuItem
             // 
-            this.debugToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cRC32FromLookupToolStripMenuItem,
-            this.gIMDebugToolStripMenuItem});
-            this.debugToolStripMenuItem.Enabled = false;
-            this.debugToolStripMenuItem.Name = "debugToolStripMenuItem";
-            this.debugToolStripMenuItem.Size = new System.Drawing.Size(54, 20);
-            this.debugToolStripMenuItem.Text = "Debug";
-            // 
-            // cRC32FromLookupToolStripMenuItem
-            // 
-            this.cRC32FromLookupToolStripMenuItem.Name = "cRC32FromLookupToolStripMenuItem";
-            this.cRC32FromLookupToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
-            this.cRC32FromLookupToolStripMenuItem.Text = "CRC32 From Lookup Tables";
-            this.cRC32FromLookupToolStripMenuItem.Click += new System.EventHandler(this.cRC32FromLookupToolStripMenuItem_Click);
-            // 
-            // dataCollectorBindingSource
-            // 
-            this.dataCollectorBindingSource.DataSource = typeof(Initial_D_PSP_Tools.InitD.DataCollector);
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
+            this.aboutToolStripMenuItem.Text = "About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // listViewMain
             // 
@@ -297,34 +316,24 @@
             this.labelMessage.TabIndex = 13;
             this.labelMessage.Text = "Please load a VFS!";
             // 
-            // aboutToolStripMenuItem
+            // dataCollectorBindingSource
             // 
-            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(52, 20);
-            this.aboutToolStripMenuItem.Text = "About";
-            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            this.dataCollectorBindingSource.DataSource = typeof(Initial_D_PSP_Tools.InitD.DataCollector);
             // 
-            // otherToolStripMenuItem
+            // gIMOptionsToolStripMenuItem
             // 
-            this.otherToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.extractVFSRecrusiveToolStripMenuItem});
-            this.otherToolStripMenuItem.Name = "otherToolStripMenuItem";
-            this.otherToolStripMenuItem.Size = new System.Drawing.Size(49, 20);
-            this.otherToolStripMenuItem.Text = "Other";
+            this.gIMOptionsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.gIMShowGIMStripMenuItem});
+            this.gIMOptionsToolStripMenuItem.Name = "gIMOptionsToolStripMenuItem";
+            this.gIMOptionsToolStripMenuItem.Size = new System.Drawing.Size(86, 20);
+            this.gIMOptionsToolStripMenuItem.Text = "GIM Options";
             // 
-            // extractVFSRecrusiveToolStripMenuItem
+            // gIMShowGIMStripMenuItem
             // 
-            this.extractVFSRecrusiveToolStripMenuItem.Name = "extractVFSRecrusiveToolStripMenuItem";
-            this.extractVFSRecrusiveToolStripMenuItem.Size = new System.Drawing.Size(184, 22);
-            this.extractVFSRecrusiveToolStripMenuItem.Text = "Extract VFS Recrusive";
-            this.extractVFSRecrusiveToolStripMenuItem.Click += new System.EventHandler(this.extractVFSRecrusiveToolStripMenuItem_Click);
-            // 
-            // gIMDebugToolStripMenuItem
-            // 
-            this.gIMDebugToolStripMenuItem.Name = "gIMDebugToolStripMenuItem";
-            this.gIMDebugToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
-            this.gIMDebugToolStripMenuItem.Text = "GIM Debug";
-            this.gIMDebugToolStripMenuItem.Click += new System.EventHandler(this.gIMDebugToolStripMenuItem_Click);
+            this.gIMShowGIMStripMenuItem.Name = "gIMShowGIMStripMenuItem";
+            this.gIMShowGIMStripMenuItem.Size = new System.Drawing.Size(182, 22);
+            this.gIMShowGIMStripMenuItem.Text = "Show GIM as Picture";
+            this.gIMShowGIMStripMenuItem.Click += new System.EventHandler(this.gIMShowGIMStripMenuItem_Click);
             // 
             // MainWindow
             // 
@@ -347,10 +356,10 @@
             this.Load += new System.EventHandler(this.MainWindow_Load);
             this.mainMenuStrip.ResumeLayout(false);
             this.mainMenuStrip.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataCollectorBindingSource)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDownOffset)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dataCollectorBindingSource)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -387,7 +396,8 @@
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem otherToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem extractVFSRecrusiveToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem gIMDebugToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem gIMOptionsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem gIMShowGIMStripMenuItem;
     }
 }
 

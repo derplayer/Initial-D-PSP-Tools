@@ -122,7 +122,12 @@ namespace Initial_D_PSP_Tools
 
         private void gIMDebugToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            new InitD.GIMCore().initGIM();
+            
+        }
+
+        private void gIMShowGIMStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new InitD.GIMCore().showGIM();
         }
     }
 }

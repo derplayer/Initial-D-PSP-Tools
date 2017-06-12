@@ -1,0 +1,26 @@
+Notes:
+CRC Checks in gim are adler32? (RCOMage guy notes this)
+gim is index4 format with separated rgba8888 palette (gimconv analyse)
+
+### GIM to PNG ###
+
+Convert it to PNG using GimConv
+gimconv "extracted.gim" -o "new_8.png"
+
+Convert the new 8bit+Alpha PNG to 32bit PNG using pngout. 
+pngout "new_8.png" "new_32bit.png" /c6 /force
+
+Edit the graphic with a programm...
+
+//Backconvert
+Convert new_32bit.png to 8bit+Alpha PNG using pngnq
+pngnq -s 1 -n 256 "new_32bit.png"
+
+Use GimConv to convert new_32bit-nq8.png into a GIM
+gimconv "logoX-nq8.png" --format_style psp --format_endian little --pixel_order faster --image_format index8 -o "logoX_FIN.gim"
+
+### END ###
+
+UMD-Replace
+
+UMD-replace.exe InitD_Test.iso \PSP_GAME\USRDIR\data\title\logo.bin logo.bin
